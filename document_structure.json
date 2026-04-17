@@ -1,0 +1,123 @@
+-- ============================================
+-- SNOWFLAKE KURULUM
+-- ============================================
+
+-- Veritabanı oluştur
+CREATE DATABASE IF NOT EXISTS sakila_dw;
+USE DATABASE sakila_dw;
+
+-- Schema oluştur
+CREATE SCHEMA IF NOT EXISTS sakila_schema;
+USE SCHEMA sakila_dw.sakila_schema;
+
+-- Warehouse oluştur
+CREATE WAREHOUSE IF NOT EXISTS sakila_wh
+  WAREHOUSE_SIZE = 'X-SMALL'
+  AUTO_SUSPEND = 60
+  AUTO_RESUME = TRUE;
+
+-- Stage oluştur
+CREATE OR REPLACE STAGE sakila_stage;
+
+-- ============================================
+-- TABLOLAR
+-- ============================================
+
+CREATE OR REPLACE TABLE customer (
+    customer_id INT,
+    store_id INT,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    address_id INT,
+    active BOOLEAN,
+    create_date TIMESTAMP,
+    last_update TIMESTAMP
+);
+
+CREATE OR REPLACE TABLE payment (
+    payment_id INT,
+    customer_id INT,
+    staff_id INT,
+    rental_id INT,
+    amount DECIMAL(5,2),
+    payment_date TIMESTAMP,
+    last_update TIMESTAMP
+);
+
+CREATE OR REPLACE TABLE rental (
+    rental_id INT,
+    rental_date TIMESTAMP,
+    inventory_id INT,
+    customer_id INT,
+    return_date TIMESTAMP,
+    staff_id INT,
+    last_update TIMESTAMP
+);
+
+-- ============================================
+-- STAR SCHEMA
+-- ============================================
+
+-- Dimension: Customer
+CREATE OR REPLACE TABLE dim_customer AS
+SELECT 
+    customer_id, 
+    first_name, 
+    last_name, 
+    email
+FROM customer;
+
+-- Dimension: Date
+CREATE OR REPLACE TABLE dim_date AS
+SELECT DISTINCT
+    DATE(payment_date) AS date_id,
+    DAY(payment_date) AS day,
+    MONTH(payment_date) AS month,
+    YEAR(payment_date) AS year
+FROM payment;
+
+-- Fact: Payment
+CREATE OR REPLACE TABLE fact_payment AS
+SELECT 
+    payment_id,
+    customer_id,
+    rental_id,
+    amount,
+    DATE(payment_date) AS date_id,
+    payment_date
+FROM payment;
+
+-- ============================================
+-- ANALİTİK SORGULAR
+-- ============================================
+
+-- Sorgu 1: Aylık gelir
+SELECT 
+    YEAR(payment_date) AS year,
+    MONTH(payment_date) AS month,
+    SUM(amount) AS total_revenue
+FROM fact_payment
+GROUP BY year, month
+ORDER BY year, month;
+
+-- Sorgu 2: En çok ödeme yapan 10 müşteri
+SELECT 
+    c.first_name, 
+    c.last_name, 
+    SUM(f.amount) AS total_spent
+FROM fact_payment f
+JOIN dim_customer c ON f.customer_id = c.customer_id
+GROUP BY c.first_name, c.last_name
+ORDER BY total_spent DESC
+LIMIT 10;
+
+-- Sorgu 3: En yüksek gelirli ay
+SELECT 
+    YEAR(payment_date) AS year,
+    MONTH(payment_date) AS month,
+    SUM(amount) AS total_revenue
+FROM fact_payment
+GROUP BY year, month
+ORDER BY total_revenue DESC
+LIMIT 1;
