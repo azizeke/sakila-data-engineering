@@ -1,4 +1,4 @@
-🚀 Proje Adımları
+🚀 Uçtan Uca Veri Entegrasyonu ve Analitik Projesi
 
 <img width="417" height="318" alt="son" src="https://github.com/user-attachments/assets/36ff1762-1e72-43ad-9883-3ebfdd1c0e66" />
 
