@@ -98,6 +98,11 @@ Aylık kiralama sayısı dağılımı
 
 
 
+## 📝 Değerlendirme
+
+Bu projede üç farklı veritabanı teknolojisini kullanarak verinin farklı mimarilerdeki davranışını gözlemledim. MySQL, ilişkisel bir veritabanı olarak Sakila gibi yapılandırılmış verileri tablolar ve yabancı anahtarlar aracılığıyla tutarlı biçimde saklamak için idealdir. Snowflake, bulut tabanlı bir veri ambarı olarak büyük veri setlerinde analitik sorgular çalıştırmak ve Star Schema gibi OLAP modellerini uygulamak için güçlü bir platformdur. MongoDB ise şemasız yapısıyla esnek belge modellemesine olanak tanır ve özellikle iç içe geçmiş veya değişken yapılı veriler için uygundur. Her üç platform da birbirini tamamlar niteliktedir: MySQL operasyonel veriler için, Snowflake analitik iş yükleri için, MongoDB ise yarı yapılandırılmış veriler için en uygun çözümü sunar. Bu proje sayesinde ETL süreçlerini uçtan uca deneyimleyerek modern veri mühendisliğinin temel bileşenlerini pratikte uyguladım.
+
+
 
 
 
